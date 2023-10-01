@@ -1,0 +1,16 @@
+reinforcement:
+  cobblestone: 10
+  iron_ingot: 25
+  gold_ingot: 50
+  diamond: 100
+
+messages:
+  owner_broken: "&aYou have broken a block you owned."
+  trusted_broken: "&aYou have broken a trusted block."
+  reinforced_block_broken_by_others: "&cYou broke %player_name% block"
+  block_reinforced_hp_remaining: "&eThe block is reinforced! HP remaining: &c%remaining_hp%."
+  already_reinforced: "&cThis block is already reinforced!"
+  block_reinforced: "&aBlock has been reinforced with %hp% HP."
+  notify_owner_damage: "Someone is trying to break your reinforced block!"
+  notify_trusted_damage: "Someone is trying to break a block you are trusted on!"
+  notify_owner_block_broken: "%breaker_name% Broke your reinforced block has been broken!"

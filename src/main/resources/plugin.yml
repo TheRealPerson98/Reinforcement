@@ -1,0 +1,7 @@
+name: wifispy
+version: '${project.version}'
+main: com.person98.wifispy.Wifispy
+commands:
+  reinforce:
+    description: Reinforce a block
+    usage: /<command>
