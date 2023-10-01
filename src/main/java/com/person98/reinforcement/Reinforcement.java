@@ -1,16 +1,15 @@
-package com.person98.wifispy;
+package com.person98.reinforcement;
 
-import com.person98.wifispy.commands.ReinforceCommand;
-import com.person98.wifispy.util.ConfigManager;
-import com.person98.wifispy.util.HologramManager;
-import com.person98.wifispy.util.ReinforcementManager;
-import com.person98.wifispy.util.listeners.BlockListener;
-import com.person98.wifispy.database.DatabaseManager;
-import com.person98.wifispy.util.listeners.ExplosionListener;
+import com.person98.reinforcement.commands.ReinforceCommand;
+import com.person98.reinforcement.util.ConfigManager;
+import com.person98.reinforcement.util.ReinforcementManager;
+import com.person98.reinforcement.util.listeners.BlockListener;
+import com.person98.reinforcement.database.DatabaseManager;
+import com.person98.reinforcement.util.listeners.ExplosionListener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public final class Wifispy extends JavaPlugin {
+public final class Reinforcement extends JavaPlugin {
 
     private DatabaseManager databaseManager;
     private ConfigManager configManager;

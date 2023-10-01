@@ -1,14 +1,14 @@
-package com.person98.wifispy.util;
+package com.person98.reinforcement.util;
 
-import com.person98.wifispy.Wifispy;
+import com.person98.reinforcement.Reinforcement;
 import org.bukkit.configuration.file.FileConfiguration;
 
 public class ConfigManager {
 
-    private final Wifispy plugin;
+    private final Reinforcement plugin;
     private final FileConfiguration config;
 
-    public ConfigManager(Wifispy plugin) {
+    public ConfigManager(Reinforcement plugin) {
         this.plugin = plugin;
         this.config = plugin.getConfig();
     }

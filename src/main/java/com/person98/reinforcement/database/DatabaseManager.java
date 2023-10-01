@@ -1,4 +1,4 @@
-package com.person98.wifispy.database;
+package com.person98.reinforcement.database;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -6,7 +6,7 @@ import java.util.List;
 
 public class DatabaseManager {
 
-    private static String URL = "jdbc:sqlite:plugins/wifispy/reinforce.db";
+    private static String URL = "jdbc:sqlite:plugins/Reinforcement/reinforce.db";
 
     public Connection connect() {
         Connection connection = null;

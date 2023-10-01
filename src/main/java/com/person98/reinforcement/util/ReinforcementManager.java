@@ -1,8 +1,8 @@
-package com.person98.wifispy.util;
+package com.person98.reinforcement.util;
 
-import com.person98.wifispy.Wifispy;
-import com.person98.wifispy.database.DatabaseManager;
-import com.person98.wifispy.database.ReinforcedBlockEntry;
+import com.person98.reinforcement.Reinforcement;
+import com.person98.reinforcement.database.DatabaseManager;
+import com.person98.reinforcement.database.ReinforcedBlockEntry;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -28,10 +28,10 @@ public class ReinforcementManager implements Listener {
     private static final List<String> REINFORCEMENT_MATERIALS = Arrays.asList("COBBLESTONE", "IRON_INGOT", "GOLD_INGOT", "DIAMOND");
     private static final SecureRandom random = new SecureRandom();
     private static final String ALPHANUMERIC_STRING = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz";
-    private final Wifispy plugin;  // Replace YourPluginClass with the actual class name of your main plugin
+    private final Reinforcement plugin;  // Replace YourPluginClass with the actual class name of your main plugin
     private final HologramManager hologramManager;
     private List<String> unreinforceableBlocks;
-    public ReinforcementManager(Wifispy plugin, ConfigManager configManager, DatabaseManager databaseManager) {
+    public ReinforcementManager(Reinforcement plugin, ConfigManager configManager, DatabaseManager databaseManager) {
         this.plugin = plugin;
         this.configManager = configManager;
         this.databaseManager = databaseManager;

@@ -1,9 +1,9 @@
-package com.person98.wifispy.util.listeners;
+package com.person98.reinforcement.util.listeners;
 
-import com.person98.wifispy.database.DatabaseManager;
-import com.person98.wifispy.database.ReinforcedBlockEntry;
-import com.person98.wifispy.util.ConfigManager;
-import com.person98.wifispy.util.HologramManager;
+import com.person98.reinforcement.database.DatabaseManager;
+import com.person98.reinforcement.database.ReinforcedBlockEntry;
+import com.person98.reinforcement.util.ConfigManager;
+import com.person98.reinforcement.util.HologramManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.block.Block;

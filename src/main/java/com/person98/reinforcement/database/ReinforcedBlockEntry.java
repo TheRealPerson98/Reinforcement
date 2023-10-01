@@ -1,4 +1,4 @@
-package com.person98.wifispy.database;
+package com.person98.reinforcement.database;
 
 public class ReinforcedBlockEntry {
 
