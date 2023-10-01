@@ -4,13 +4,34 @@ reinforcement:
   gold_ingot: 50
   diamond: 100
 
+tnt_damage: 10
+
+unreinforceable-blocks:
+  - BEDROCK
+  - BARRIER
+  - END_PORTAL_FRAME
+  - END_PORTAL
+
+
+hologram:
+  display_range: 5
+
 messages:
-  owner_broken: "&aYou have broken a block you owned."
-  trusted_broken: "&aYou have broken a trusted block."
-  reinforced_block_broken_by_others: "&cYou broke %player_name% block"
+  reinforced_block_broken_by_others: "&cYou broke %player_name%'s block"
   block_reinforced_hp_remaining: "&eThe block is reinforced! HP remaining: &c%remaining_hp%."
   already_reinforced: "&cThis block is already reinforced!"
   block_reinforced: "&aBlock has been reinforced with %hp% HP."
-  notify_owner_damage: "Someone is trying to break your reinforced block!"
-  notify_trusted_damage: "Someone is trying to break a block you are trusted on!"
-  notify_owner_block_broken: "%breaker_name% Broke your reinforced block has been broken!"
+  notify_owner_damage: "Your reinforced block at %x%, %y%, %z% was damaged."
+  notify_trusted_damage: "A reinforced block you're trusted with at %x%, %y%, %z% was damaged."
+  notify_owner_block_broken: "Your reinforced block at %x%, %y%, %z% was broken by %breaker_name%."
+  check_block_reinforced: "&eThis container is reinforced! HP remaining: &c%remaining_hp%."
+  owner_trusted_player: "&aYou have trusted %player_name% on this block."
+  player_trusted_owner: "&a%player_name% has trusted you on their blocks."
+  cant_reinforce: "&cYou can't reinforce this block!"
+  holo_disabled: "&cHolograms are disabled!"
+  holo_visible: "&aHolograms are now visible!"
+  tnt_notify_owner_damage: "Your reinforced block at %x%, %y%, %z% took damage with tnt!"
+  tnt_notify_trusted_damage: "A reinforced block at %x%, %y%, %z% was damaged by an explosion."
+  notify_trusted_block_broken: "A reinforced block you're trusted with at %x%, %y%, %z% was broken by %breaker_name%."
+  notify_owner_broke_own_block: "You've broken one of your reinforced blocks at %x%, %y%, %z%."
+  notify_trusted_broke_trusted_block: "You've broken a reinforced block you're trusted with at %x%, %y%, %z%."

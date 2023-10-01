@@ -1,6 +1,9 @@
 name: wifispy
 version: '${project.version}'
 main: com.person98.wifispy.Wifispy
+depend: [DecentHolograms]
+author: Person98
+description: A plugin that allows you to reinforce blocks
 commands:
   reinforce:
     description: Reinforce a block

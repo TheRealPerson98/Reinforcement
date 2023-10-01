@@ -17,6 +17,9 @@ import org.bukkit.metadata.MetadataValue;
 import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class ReinforcementManager implements Listener {
 
@@ -25,16 +28,16 @@ public class ReinforcementManager implements Listener {
     private static final List<String> REINFORCEMENT_MATERIALS = Arrays.asList("COBBLESTONE", "IRON_INGOT", "GOLD_INGOT", "DIAMOND");
     private static final SecureRandom random = new SecureRandom();
     private static final String ALPHANUMERIC_STRING = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz";
-
     private final Wifispy plugin;  // Replace YourPluginClass with the actual class name of your main plugin
-
     private final HologramManager hologramManager;
-
+    private List<String> unreinforceableBlocks;
     public ReinforcementManager(Wifispy plugin, ConfigManager configManager, DatabaseManager databaseManager) {
         this.plugin = plugin;
         this.configManager = configManager;
         this.databaseManager = databaseManager;
-        this.hologramManager = new HologramManager();
+        this.hologramManager = new HologramManager(configManager);
+        this.unreinforceableBlocks = plugin.getConfig().getStringList("unreinforceable-blocks");
+
     }
 
     @EventHandler
@@ -48,6 +51,14 @@ public class ReinforcementManager implements Listener {
             if (player.hasMetadata("CanReinforce")) {
                 List<MetadataValue> values = player.getMetadata("CanReinforce");
                 for (MetadataValue value : values) {
+
+                    if (unreinforceableBlocks.contains(block.getType().name())) {
+                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', configManager.getMessage("cant_reinforce")));
+
+                        player.sendMessage(ChatColor.RED + "You can't reinforce this block.");
+                        return;
+                    }
+
                     if (REINFORCEMENT_MATERIALS.contains(materialName)) {
                         ReinforcedBlockEntry existingEntry = databaseManager.getReinforcedBlock(
                                 block.getWorld().getName(),
@@ -71,7 +82,18 @@ public class ReinforcementManager implements Listener {
                             Location holoLocation = block.getLocation().add(0.5, 2, 0.5);
                             hologramManager.createHologram(holoId, holoLocation, Arrays.asList(ChatColor.RED + String.valueOf(hp) + " ❤"), true);
 
+                            // Retrieve all reinforced blocks owned by the player
+                            List<ReinforcedBlockEntry> blocksByOwner = databaseManager.getAllReinforcedBlocksByOwner(player.getUniqueId().toString());
 
+                            // Extract all trusted UUIDs and store in a set to ensure uniqueness
+                            Set<String> trustedUUIDs = blocksByOwner.stream()
+                                    .map(ReinforcedBlockEntry::getTrusted)
+                                    .filter(Objects::nonNull)
+                                    .flatMap(trusted -> Arrays.stream(trusted.split(",")))
+                                    .collect(Collectors.toSet());
+
+                            // Convert set to comma-separated string
+                            String trustedPlayers = String.join(",", trustedUUIDs);
 
                             ReinforcedBlockEntry entry = new ReinforcedBlockEntry(
                                     0,
@@ -83,7 +105,7 @@ public class ReinforcementManager implements Listener {
                                     System.currentTimeMillis(),
                                     player.getUniqueId().toString(),
                                     holoId, // Store the holo ID
-                                    null
+                                    trustedPlayers // Store the merged trusted players
                             );
                             databaseManager.addReinforcedBlock(entry);
                             String message = configManager.getMessage("block_reinforced").replace("%hp%", String.valueOf(hp));

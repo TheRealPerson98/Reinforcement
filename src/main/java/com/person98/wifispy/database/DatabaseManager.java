@@ -207,4 +207,23 @@ public class DatabaseManager {
             e.printStackTrace();
         }
     }
+    public List<String> getAllHoloIds() {
+        List<String> holoNames = new ArrayList<>();
+
+        String sql = "SELECT holo_id FROM reinforced_blocks";
+
+        try (Connection connection = connect();
+             PreparedStatement pstmt = connection.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                holoNames.add(rs.getString("holo_id"));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return holoNames;
+    }
 }
