@@ -1,11 +1,17 @@
 package com.person98.reinforcement.database;
 
+import com.person98.reinforcement.util.ConfigManager;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class DatabaseManager {
+    private ConfigManager configManager;
 
+    public DatabaseManager(ConfigManager configManager) {
+        this.configManager = configManager;
+    }
     private static String URL = "jdbc:sqlite:plugins/Reinforcement/reinforce.db";
 
     public Connection connect() {
@@ -19,6 +25,8 @@ public class DatabaseManager {
     }
 
     public void initializeDatabase() {
+        int startingHP = configManager.getStartingHP();
+
         // Owners table
         String sqlOwners = "CREATE TABLE IF NOT EXISTS owners (" +
                 "uuid TEXT PRIMARY KEY," +
@@ -45,15 +53,31 @@ public class DatabaseManager {
                 "trusted TEXT," +  // Add this line for trusted users
                 "FOREIGN KEY (owner_uuid) REFERENCES owners(uuid));";
 
+        String sqlHearts = "CREATE TABLE IF NOT EXISTS hearts (" +
+                "id INTEGER PRIMARY KEY," +
+                "owner_uuid TEXT NOT NULL," +
+                "world TEXT NOT NULL," +
+                "x INTEGER NOT NULL," +
+                "y INTEGER NOT NULL," +
+                "z INTEGER NOT NULL," +
+                "hp INTEGER DEFAULT " + startingHP + " NOT NULL," +
+                "trusted TEXT," +
+                "holo_id TEXT," +
+                "name TEXT," +
+                "FOREIGN KEY (owner_uuid) REFERENCES owners(uuid));";
+
 
         try (Connection connection = connect();
              PreparedStatement pstmtOwners = connection.prepareStatement(sqlOwners);
              PreparedStatement pstmtTrusted = connection.prepareStatement(sqlTrusted);
-             PreparedStatement pstmtBlocks = connection.prepareStatement(sqlBlocks)) {
+             PreparedStatement pstmtBlocks = connection.prepareStatement(sqlBlocks);
+             PreparedStatement pstmHearts = connect().prepareStatement(sqlHearts))
+        {
 
             pstmtOwners.execute();
             pstmtTrusted.execute();
             pstmtBlocks.execute();
+            pstmHearts.execute();
 
         } catch (SQLException e) {
             e.printStackTrace();

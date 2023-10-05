@@ -28,21 +28,6 @@ public class HologramManager {
 
         return hologram;
     }
-    public void setShowPlayer(Player player, Hologram hologram) {
-        hologram.setShowPlayer(player);
-    }
-
-    public void removeShowPlayer(Player player, Hologram hologram) {
-        hologram.removeShowPlayer(player);
-    }
-
-    public void setHidePlayer(Player player, Hologram hologram) {
-        hologram.setHidePlayer(player);
-    }
-
-    public void removeHidePlayer(Player player, Hologram hologram) {
-        hologram.removeHidePlayer(player);
-    }
     public void showHologram(Player player, String hologramName) {
         Hologram hologram = DHAPI.getHologram(hologramName);
         if (hologram != null) {

@@ -1,3 +1,6 @@
+ConfigVersion: 1 # Don't change this
+
+
 reinforcement:
   cobblestone: 10
   iron_ingot: 25
@@ -12,6 +15,10 @@ unreinforceable-blocks:
   - END_PORTAL_FRAME
   - END_PORTAL
 
+Hearts:
+  starting_hp: 1000
+  notifydes: 250
+  price: 1000
 
 hologram:
   display_range: 5
@@ -35,3 +42,13 @@ messages:
   notify_trusted_block_broken: "A reinforced block you're trusted with at %x%, %y%, %z% was broken by %breaker_name%."
   notify_owner_broke_own_block: "You've broken one of your reinforced blocks at %x%, %y%, %z%."
   notify_trusted_broke_trusted_block: "You've broken a reinforced block you're trusted with at %x%, %y%, %z%."
+
+  heart_first_break_notify_owner: "&cWarning! %breaker_name% has started breaking your heart at %x%, %y%, %z%!"
+  heart_break_notify_owner: "&cWarning! %breaker_name% is breaking your heart at %x%, %y%, %z%! HP left: %remaining_hp%."
+  heart_first_break_notify_trusted: "&cWarning! %breaker_name% has started breaking a heart you're trusted with at %x%, %y%, %z%!"
+  heart_break_notify_trusted: "&cWarning! %breaker_name% is breaking a heart you're trusted with at %x%, %y%, %z%! HP left: %remaining_hp%."
+
+  enterProximity: "&eYou have entered the territory of heart '%heartname%'!"
+  exitProximity: "&eYou have left the %heartname%'s territory!"
+  intruderNotification: "&cWarning! %intruder% has entered near your heart at %coordx%, %coordy%, %coordz% named %heartname%!"
+  trustedIntruderNotification: "&cWarning! %intruder% has entered near a heart you are trusted with at %coordx%, %coordy%, %coordz% named %heartname%!"

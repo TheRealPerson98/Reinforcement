@@ -6,6 +6,7 @@ import com.person98.reinforcement.util.ConfigManager;
 import com.person98.reinforcement.util.HologramManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Container;
 import org.bukkit.entity.Player;
@@ -143,10 +144,10 @@ public class BlockListener implements Listener {
     }
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
-        if(event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+        if (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.PHYSICAL) {
             Block block = event.getClickedBlock();
 
-            if (block != null && isContainer(block)) {
+            if (block != null && (isContainer(block) || isDoorOrTrapdoor(block) || isRedstoneComponent(block))) {
                 String world = block.getWorld().getName();
                 int x = block.getX();
                 int y = block.getY();
@@ -159,7 +160,7 @@ public class BlockListener implements Listener {
                     String owner = entry.getOwnerUuid();
                     String trusted = entry.getTrusted();
 
-                    // If the player is neither the owner nor trusted, they can't access the container
+                    // If the player is neither the owner nor trusted, they can't interact with the block
                     if (!player.getUniqueId().toString().equals(owner) && (trusted == null || !trusted.contains(player.getUniqueId().toString()))) {
                         String message = configManager.getMessage("check_block_reinforced");
                         message = message.replace("%remaining_hp%", String.valueOf(entry.getHp()));
@@ -169,6 +170,19 @@ public class BlockListener implements Listener {
             }
         }
     }
+
+    private boolean isDoorOrTrapdoor(Block block) {
+        Material type = block.getType();
+        return type.name().endsWith("_DOOR") || type.name().endsWith("_TRAPDOOR");
+    }
+
+    private boolean isRedstoneComponent(Block block) {
+        Material type = block.getType();
+        return type == Material.LEVER
+                || type.name().endsWith("_BUTTON")
+                || type.name().endsWith("_PRESSURE_PLATE");
+    }
+
 
     // Helper method to check if a block is a container
     private boolean isContainer(Block block) {

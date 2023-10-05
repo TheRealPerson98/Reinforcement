@@ -24,5 +24,15 @@ public class ConfigManager {
     public String getMessage(String key) {
         return this.plugin.getConfig().getString("messages." + key);
     }
+    public int getStartingHP() {
+        return config.getInt("Hearts.starting_hp", 1000); // Default is 1000 if not set in the config
+    }
+
+    public int getNotifyDistance() {
+        return config.getInt("Hearts.notifydes", 250); // Default is 250 if not set in the config
+    }
+    public int getHeartPrice() {
+        return config.getInt("Hearts.price", 1000); // Default is 1000 if not set in the config
+    }
 
 }

@@ -1,8 +1,10 @@
 package com.person98.reinforcement.commands;
 
 import com.person98.reinforcement.database.DatabaseManager;
+import com.person98.reinforcement.database.HeartManager;
 import com.person98.reinforcement.database.ReinforcedBlockEntry;
 import com.person98.reinforcement.util.ConfigManager;
+import com.person98.reinforcement.util.Heart;
 import com.person98.reinforcement.util.HologramManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -23,12 +25,14 @@ public class ReinforceCommand implements CommandExecutor {
     private DatabaseManager dbManager;
     private ConfigManager configManager;
     private HologramManager hologramManager;
+    private HeartManager heartManager;
 
-    public ReinforceCommand(Plugin plugin, DatabaseManager dbManager, ConfigManager configManager) {
+    public ReinforceCommand(Plugin plugin, DatabaseManager dbManager, ConfigManager configManager, HeartManager heartManager) {
         this.plugin = plugin;
         this.dbManager = dbManager;
         this.configManager = configManager;
         this.hologramManager = new HologramManager(configManager);
+        this.heartManager = new HeartManager(dbManager);
 
     }
 
@@ -70,19 +74,34 @@ public class ReinforceCommand implements CommandExecutor {
             player.sendMessage(ChatColor.GOLD + "/reinforce untrust <username>" + ChatColor.WHITE + " - Untrust a player.");
             player.sendMessage(ChatColor.GOLD + "/reinforce holo" + ChatColor.WHITE + " - Toggle holograms visibility.");
             player.sendMessage(ChatColor.GOLD + "/reinforce help" + ChatColor.WHITE + " - Display this help message.");
+            player.sendMessage(ChatColor.GOLD + "/reinforce heart <name>" + ChatColor.WHITE + " - Create a heart with a given name.");
+            player.sendMessage(ChatColor.GOLD + "/reinforce destroyheart" + ChatColor.WHITE + " - Destroy your heart reinforcement.");
+
+            if(player.isOp()) {  // Check if player has operator permissions
+                player.sendMessage(ChatColor.RED + "---- Admin Commands ----");
+                player.sendMessage(ChatColor.GOLD + "/reinforce admin destroy" + ChatColor.WHITE + " - Destroy a target's heart.");
+                player.sendMessage(ChatColor.GOLD + "/reinforce admin heartlist" + ChatColor.WHITE + " - List all hearts on the server.");
+            }
+
             return true;
         }
 
+
         if (args.length == 2 && args[0].equalsIgnoreCase("trust")) {
             String trustedUsername = args[1];
-            OfflinePlayer trustedOfflinePlayer = Bukkit.getOfflinePlayer(trustedUsername);
 
-            if (!trustedOfflinePlayer.hasPlayedBefore()) {  // If the player never played before
+            UUID trustedPlayerUUID = null;
+            for (OfflinePlayer offPlayer : Bukkit.getOfflinePlayers()) {
+                if (offPlayer.getName().equalsIgnoreCase(trustedUsername)) {
+                    trustedPlayerUUID = offPlayer.getUniqueId();
+                    break;
+                }
+            }
+
+            if (trustedPlayerUUID == null) {
                 player.sendMessage(ChatColor.RED + "Player not found or has never joined the server!");
                 return true;
             }
-
-            UUID trustedPlayerUUID = trustedOfflinePlayer.getUniqueId();
 
             // Fetch all reinforced blocks owned by the player
             for (ReinforcedBlockEntry entry : dbManager.getAllReinforcedBlocksByOwner(player.getUniqueId().toString())) {
@@ -94,8 +113,8 @@ public class ReinforceCommand implements CommandExecutor {
             message = message.replace("%player_name%", trustedUsername);
             player.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
 
-            if (trustedOfflinePlayer.isOnline()) {  // Only send the message if the player is online
-                Player onlineTrustedPlayer = (Player) trustedOfflinePlayer;
+            Player onlineTrustedPlayer = Bukkit.getPlayer(trustedPlayerUUID);
+            if (onlineTrustedPlayer != null) {
                 String message2 = configManager.getMessage("player_trusted_owner");
                 message2 = message2.replace("%player_name%", player.getName());
                 onlineTrustedPlayer.sendMessage(ChatColor.translateAlternateColorCodes('&', message2));
@@ -103,6 +122,7 @@ public class ReinforceCommand implements CommandExecutor {
 
             return true;
         }
+
         if (args.length == 1 && args[0].equalsIgnoreCase("trustlist")) {
             List<ReinforcedBlockEntry> entries = dbManager.getAllReinforcedBlocksByOwner(player.getUniqueId().toString());
             Set<String> trustedUUIDs = entries.stream()
@@ -127,19 +147,28 @@ public class ReinforceCommand implements CommandExecutor {
         // untrust subcommand
         if (args.length == 2 && args[0].equalsIgnoreCase("untrust")) {
             String untrustedUsername = args[1];
-            OfflinePlayer untrustedPlayer = Bukkit.getOfflinePlayer(untrustedUsername);
 
-            if (!untrustedPlayer.hasPlayedBefore()) {
+            UUID untrustedPlayerUUID = null;
+            for (OfflinePlayer offPlayer : Bukkit.getOfflinePlayers()) {
+                if (offPlayer.getName().equalsIgnoreCase(untrustedUsername)) {
+                    untrustedPlayerUUID = offPlayer.getUniqueId();
+                    break;
+                }
+            }
+
+            if (untrustedPlayerUUID == null) {
                 player.sendMessage(ChatColor.RED + "Player not found!");
                 return true;
             }
 
+            final UUID finalUntrustedPlayerUUID = untrustedPlayerUUID; // Create an effectively final variable
+
             boolean untrusted = false;
             List<ReinforcedBlockEntry> entries = dbManager.getAllReinforcedBlocksByOwner(player.getUniqueId().toString());
             for (ReinforcedBlockEntry entry : entries) {
-                if (entry.getTrusted() != null && entry.getTrusted().contains(untrustedPlayer.getUniqueId().toString())) {
+                if (entry.getTrusted() != null && entry.getTrusted().contains(finalUntrustedPlayerUUID.toString())) {
                     String updatedTrustList = Arrays.stream(entry.getTrusted().split(","))
-                            .filter(uuid -> !uuid.equals(untrustedPlayer.getUniqueId().toString()))
+                            .filter(uuid -> !uuid.equals(finalUntrustedPlayerUUID.toString()))
                             .collect(Collectors.joining(","));
 
                     entry.setTrusted(updatedTrustList.isEmpty() ? null : updatedTrustList);
@@ -157,6 +186,38 @@ public class ReinforceCommand implements CommandExecutor {
             return true;
         }
 
+
+            // For the /reinforce heart <name> command
+        if (args.length == 2 && args[0].equalsIgnoreCase("heart")) {
+            String heartName = args[1].trim();  // Trim to remove any leading or trailing whitespace
+
+            if (heartName.isEmpty()) {  // Check if the heartName is empty after trimming
+                player.sendMessage(ChatColor.RED + "You must provide a valid name for your heart!");
+                return true;
+            }
+
+            // Ensure player doesn't already have a heart
+            if (heartManager.getHeartByOwner(player.getUniqueId().toString())) {
+                player.sendMessage(ChatColor.RED + "You already have a heart. Destroy it first if you want to set a new one.");
+                return true;
+            }
+
+            player.setMetadata("SettingHeart", new FixedMetadataValue(plugin, heartName));
+            player.sendMessage(ChatColor.GREEN + "Right-click the block you want to set as your heart named: " + heartName);
+            return true;
+        }
+
+
+        // For the /reinforce destroyheart command
+        if (args.length == 1 && args[0].equalsIgnoreCase("destroyheart")) {
+            if (heartManager.removeHeart(player.getUniqueId())) {
+                player.sendMessage(ChatColor.GREEN + "Your heart has been removed.");
+            } else {
+                player.sendMessage(ChatColor.RED + "You don't have a heart set.");
+            }
+            return true;
+        }
+
         if (player.hasMetadata("CanReinforce")) {
             player.removeMetadata("CanReinforce", plugin);
             player.sendMessage(ChatColor.RED + "Reinforce mode disabled!");
@@ -164,6 +225,37 @@ public class ReinforceCommand implements CommandExecutor {
             player.setMetadata("CanReinforce", new FixedMetadataValue(plugin, true));
             player.sendMessage(ChatColor.GREEN + "Reinforce mode enabled!");
         }
+
+        if (args.length > 1 && args[0].equalsIgnoreCase("admin")) {
+            if (!player.isOp()) {
+                player.sendMessage(ChatColor.RED + "You don't have permission to use this command.");
+                return true;
+            }
+
+            if (args[1].equalsIgnoreCase("destroy") && args.length == 3) {
+                String targetPlayerName = args[2];
+                OfflinePlayer targetPlayer = Bukkit.getOfflinePlayer(targetPlayerName);
+
+                if (heartManager.removeHeart(targetPlayer.getUniqueId())) {
+                    player.sendMessage(ChatColor.GREEN + targetPlayerName + "'s heart has been removed.");
+                } else {
+                    player.sendMessage(ChatColor.RED + targetPlayerName + " doesn't have a heart set.");
+                }
+                return true;
+            } else if (args[1].equalsIgnoreCase("heartlist")) {
+                List<Heart> allHearts = heartManager.getAllHearts();
+                if (allHearts.isEmpty()) {
+                    player.sendMessage(ChatColor.RED + "There are no hearts set on the server.");
+                } else {
+                    player.sendMessage(ChatColor.GREEN + "Listing all hearts on the server:");
+                    for (Heart heart : allHearts) {
+                        player.sendMessage(ChatColor.GOLD + heart.getName() + " owned by " + Bukkit.getOfflinePlayer(heart.getOwnerUUID()).getName());
+                    }
+                }
+                return true;
+            }
+        }
+
 
         return true;
     }
