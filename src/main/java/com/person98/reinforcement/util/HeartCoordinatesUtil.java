@@ -80,7 +80,7 @@ public class HeartCoordinatesUtil {
                     }
                 }
             }
-        }, 0L, 20L * 30);  // This checks every 30 seconds (20 ticks = 1 second)
+        }, 0L, 20L * configManager.getHeartTrackingTime());
     }
 
 

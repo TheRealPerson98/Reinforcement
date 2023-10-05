@@ -1,4 +1,4 @@
-ConfigVersion: 1 # Don't change this
+ConfigVersion: 2 # Don't change this
 
 
 reinforcement:
@@ -19,6 +19,7 @@ Hearts:
   starting_hp: 1000
   notifydes: 250
   price: 1000
+  tracking_time: 30
 
 hologram:
   display_range: 5

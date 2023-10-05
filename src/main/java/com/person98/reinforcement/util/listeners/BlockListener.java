@@ -144,32 +144,42 @@ public class BlockListener implements Listener {
     }
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
-        if (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.PHYSICAL) {
+        Action action = event.getAction();
+        if (action == Action.RIGHT_CLICK_BLOCK || action == Action.PHYSICAL) {
             Block block = event.getClickedBlock();
 
-            if (block != null && (isContainer(block) || isDoorOrTrapdoor(block) || isRedstoneComponent(block))) {
-                String world = block.getWorld().getName();
-                int x = block.getX();
-                int y = block.getY();
-                int z = block.getZ();
+            if (block != null) {
+                // For PHYSICAL, specifically check if it's a pressure plate to prevent other unintentional actions
+                if (action == Action.PHYSICAL && !block.getType().name().endsWith("_PRESSURE_PLATE")) {
+                    event.setCancelled(true);
+                    return;
+                }
 
-                ReinforcedBlockEntry entry = dbManager.getReinforcedBlock(world, x, y, z);
+                if (isContainer(block) || isDoorOrTrapdoor(block) || isRedstoneComponent(block)) {
+                    String world = block.getWorld().getName();
+                    int x = block.getX();
+                    int y = block.getY();
+                    int z = block.getZ();
 
-                if (entry != null) {
-                    Player player = event.getPlayer();
-                    String owner = entry.getOwnerUuid();
-                    String trusted = entry.getTrusted();
+                    ReinforcedBlockEntry entry = dbManager.getReinforcedBlock(world, x, y, z);
 
-                    // If the player is neither the owner nor trusted, they can't interact with the block
-                    if (!player.getUniqueId().toString().equals(owner) && (trusted == null || !trusted.contains(player.getUniqueId().toString()))) {
-                        String message = configManager.getMessage("check_block_reinforced");
-                        message = message.replace("%remaining_hp%", String.valueOf(entry.getHp()));
-                        event.setCancelled(true);
+                    if (entry != null) {
+                        Player player = event.getPlayer();
+                        String owner = entry.getOwnerUuid();
+                        String trusted = entry.getTrusted();
+
+                        // If the player is neither the owner nor trusted, they can't interact with the block
+                        if (!player.getUniqueId().toString().equals(owner) && (trusted == null || !trusted.contains(player.getUniqueId().toString()))) {
+                            String message = configManager.getMessage("check_block_reinforced");
+                            message = message.replace("%remaining_hp%", String.valueOf(entry.getHp()));
+                            event.setCancelled(true);
+                        }
                     }
                 }
             }
         }
     }
+
 
     private boolean isDoorOrTrapdoor(Block block) {
         Material type = block.getType();

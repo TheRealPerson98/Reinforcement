@@ -19,7 +19,7 @@ public class ConfigVersionChecker {
     public void checkVersion() {
         plugin.getLogger().info("Checking config version...");
 
-        int internalVersion = 1; // The version inside your plugin
+        int internalVersion = 2; // The version inside your plugin
         FileConfiguration config = plugin.getConfig();
 
         if (!config.contains("ConfigVersion") || config.getInt("ConfigVersion") != internalVersion) {

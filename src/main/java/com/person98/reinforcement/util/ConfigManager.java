@@ -34,5 +34,8 @@ public class ConfigManager {
     public int getHeartPrice() {
         return config.getInt("Hearts.price", 1000); // Default is 1000 if not set in the config
     }
+    public int getHeartTrackingTime() {
+        return config.getInt("Hearts.tracking_time", 30);  // Default is 5 seconds if not set in the config
+    }
 
 }
